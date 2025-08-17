@@ -14,36 +14,57 @@ import (
 func Register(c *fiber.Ctx) error {
 	user := new(auth.User)
 	if err := c.BodyParser(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid input",
+		})
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot hash password"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"message": "Cannot hash password",
+		})
 	}
 	user.Password = string(hashedPassword)
 
 	if err := config.DB.Create(&user).Error; err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Username already exists"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": "Username already exists",
+		})
 	}
 
-	return c.JSON(fiber.Map{"message": "User created successfully"})
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "User created successfully",
+	})
 }
 
 func Login(c *fiber.Ctx) error {
 	body := new(auth.User)
 	if err := c.BodyParser(body); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid input",
+		})
 	}
 
 	user := new(auth.User)
 	if err := config.DB.Where("email = ?", body.Email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid credentials"})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid credentials",
+		})
 	}
 
 	// เช็ครหัสผ่าน
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password)); err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid credentials"})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid credentials",
+		})
 	}
 
 	// สร้าง JWT Token
@@ -56,8 +77,15 @@ func Login(c *fiber.Ctx) error {
 	secret := os.Getenv("JWT_SECRET")
 	t, err := token.SignedString([]byte(secret))
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not login"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"message": "Could not login",
+		})
 	}
 
-	return c.JSON(fiber.Map{"token": t})
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "Login Successful!",
+		"token": t,
+	})
 }
