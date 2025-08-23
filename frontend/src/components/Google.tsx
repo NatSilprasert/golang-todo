@@ -1,20 +1,42 @@
 import { useGoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
-
+import axios from 'axios';
+import { backEndUrl } from '../assets/config';
+import { toast } from 'sonner';
+import { useAppContext } from '../context/AppContext';
 
 export default function Google({signUp}: {signUp: boolean}) {
+
+  const { navigate, setToken } = useAppContext();
+
   const login = useGoogleLogin({
-    onSuccess: tokenResponse => {
-      const token = tokenResponse.credential;
-      if (token) {
-        const userInfo = jwtDecode(token);
-        console.log(userInfo);
-      } else {
-        console.log('No token received');
+    onSuccess: async (credentialResponse) => {
+
+      console.log("Google Access Token:", credentialResponse.access_token);
+
+      try {
+        const response = await axios.post(backEndUrl + '/api/google/login', {
+          token: credentialResponse.access_token,
+        });
+
+    
+        setToken(response.data.token)
+        localStorage.setItem("token", response.data.token);
+        toast.success("Login Successful!", {
+          description: "Welcome back! You are now logged in.",
+          duration: 4000,
+          icon: "🎉",
+        })
+        navigate('/');
+        
+        
+      } catch (error: any) {
+        toast.error("Error Message", {
+        description: error.response.data.message
+        })
       }
     },
     onError: () => {
-      console.log('Login Failed');
+      console.log("Login Failed");
     },
   });
 
@@ -32,4 +54,3 @@ export default function Google({signUp}: {signUp: boolean}) {
     </button>
   );
 }
-

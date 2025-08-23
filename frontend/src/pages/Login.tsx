@@ -122,6 +122,7 @@ const Login = () => {
                     }  
 
                     <button 
+                        disabled={!isFormValid}
                         className={`mt-4 px-6 py-3 rounded flex gap-2 items-center justify-center border border-bg2 ${isFormValid ? 'text-white bg-bg-hover/30 hover:border-white/50' : 'bg-bg2 text-muted-foreground'}`}>
                             {signUp ? 'Sign up' : 'Login'}
                     </button>

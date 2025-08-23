@@ -11,6 +11,11 @@ func Setup(app *fiber.App) {
 	app.Post("/api/register", handlers.Register)
 	app.Post("/api/login", handlers.Login)
 
+	// Google OAuth2
+	app.Post("/api/google/login", handlers.GoogleLogin)
+	// Github OAuth
+	app.Post("/api/github/login", handlers.GithubLogin)
+
 	api := app.Group("/api", handlers.JWTProtected())
 
 	api.Get("/todos", handlers.GetTodos)

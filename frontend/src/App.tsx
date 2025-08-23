@@ -3,12 +3,14 @@ import Home from "./pages/Home"
 import Login from "./pages/Login"
 import { GoogleOAuthProvider } from "@react-oauth/google"
 import { Toaster } from "sonner"
+import { GoogleClientID } from "./assets/config"
+import GithubCallback from "./pages/GithubCallback"
 
 
 const App = () => {
   return (
     <div className="min-h-screen">
-      <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+      <GoogleOAuthProvider clientId={GoogleClientID}>
         <Toaster 
           theme="dark"
           richColors={true}
@@ -23,6 +25,7 @@ const App = () => {
         <Routes>
             <Route path="/" element={<Home />}/>
             <Route path="/login" element={<Login />}/>
+            <Route path="/callback" element={<GithubCallback />}/>
         </Routes>
       </GoogleOAuthProvider>
     </div>
