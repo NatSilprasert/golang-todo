@@ -31,7 +31,7 @@ export default function Google({signUp}: {signUp: boolean}) {
         
       } catch (error: any) {
         toast.error("Error Message", {
-        description: error.response.data.message
+          description: error.response.data.message
         })
       }
     },

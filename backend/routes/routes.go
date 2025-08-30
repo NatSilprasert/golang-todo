@@ -19,7 +19,7 @@ func Setup(app *fiber.App) {
 	api := app.Group("/api", handlers.JWTProtected())
 
 	api.Get("/todos", handlers.GetTodos)
-	api.Post("/todos", handlers.CreateTodo)
+	api.Get("/createTodos", handlers.CreateTodo)
 	app.Put("/todos/:id", handlers.UpdateTodo)
 	app.Delete("/todos/:id", handlers.DeleteTodo)
 }

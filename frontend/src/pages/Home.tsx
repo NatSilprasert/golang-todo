@@ -1,11 +1,11 @@
-import Todo from "../components/Todo"
+import TodoSection from "../components/TodoSection"
 import Navbar from "../components/Navbar"
 
 const Home = () => {
   return (
     <div>
       <Navbar />
-      <Todo />
+      <TodoSection />
     </div>
     
   )

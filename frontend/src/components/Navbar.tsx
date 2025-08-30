@@ -23,7 +23,7 @@ const Navbar = () => {
         <Link to='/login'>
             <button 
               onClick={buttonHandler}
-              className="px-6 py-3 bg-bg2 rounded-2xl flex gap-2 items-center hover:bg-bg-hover/30"
+              className="px-6 py-3 bg-bg2 rounded-2xl flex gap-2 items-center hover:bg-bg-hover/40"
             >
               {token ? <ArrowLeft size={16} /> : <ArrowRight size={16} /> }
               <p>{token ? 'Logout' : 'Login'}</p>

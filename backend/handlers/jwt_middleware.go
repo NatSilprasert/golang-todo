@@ -12,7 +12,9 @@ func JWTProtected() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Missing or malformed JWT"})
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Missing or malformed JWT",
+			})
 		}
 
 		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
@@ -20,14 +22,36 @@ func JWTProtected() fiber.Handler {
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
-
 		if err != nil || !token.Valid {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired JWT"})
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Invalid or expired JWT",
+			})
 		}
 
-		// Save user id to locals for later use
-		claims := token.Claims.(jwt.MapClaims)
-		c.Locals("userId", uint(claims["id"].(float64)))
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Invalid JWT claims",
+			})
+		}
+
+		// ใช้ "sub" เป็น user ID
+		subVal, ok := claims["sub"]
+		if !ok || subVal == nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "JWT does not contain user id",
+			})
+		}
+
+		userIdFloat, ok := subVal.(float64)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Invalid user id type in JWT",
+			})
+		}
+
+		userId := uint(userIdFloat)
+		c.Locals("userId", userId)
 
 		return c.Next()
 	}
